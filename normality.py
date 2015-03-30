@@ -26,7 +26,7 @@ except ImportError:
     pass  # Seaborn is not required.
 
 
-def main(filename, field, delimiter):
+def main(filename, field, delimiter, out):
 
     data = extract_column(filename, field, delimiter)
     data = data[~np.isnan(data)]
@@ -37,7 +37,13 @@ def main(filename, field, delimiter):
 
     create_qq_plot(data, axes[1])
 
-    plt.show()
+    if not out:
+        plt.show()
+    else:
+        if out.endswith("png") or out.endswith("jpg"):
+            plt.savefig(out, dpi=400)
+        else:
+            plt.savefig(out)
 
 
 def create_histogram(data, ax):
@@ -128,7 +134,7 @@ def extract_column(filename, field, delimiter):
             elif len(line) > field:
                 value = line[field]
             else:
-                value = None
+                value = ""
 
             data.append(value)
 
@@ -143,11 +149,17 @@ def extract_column(filename, field, delimiter):
             data[i] = None
 
     data = np.array(data, dtype=float)
+    num_missing = np.sum(np.isnan(data))
     logging.info("Read {} values ({} missing) from file {}.".format(
         np.sum(~np.isnan(data)),
         np.sum(np.isnan(data)),
         filename if filename != "-" else "stdin"
     ))
+
+    if num_missing > 0.5 * len(data):
+        raise Exception("Could not find your data (invalid column? "
+                        "Or most (>50%) values are missing. If this is "
+                        "really the case, please grep the missing values out.")
 
     return data
 
@@ -184,11 +196,17 @@ def parse_args():
         action="store_true",
     )
 
+    parser.add_argument(
+        "--save", "-o",
+        help="The filename to write the plot.",
+        default=None
+    )
+
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
-    main(args.file, args.field, args.delimiter)
+    main(args.file, args.field, args.delimiter, out=args.save)
 
 if __name__ == "__main__":
     args = parse_args()
