@@ -18,6 +18,7 @@ import gzip
 
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.stats
 
 try:
     import seaborn as sbn
@@ -63,7 +64,21 @@ def create_histogram(data, ax):
 
 def create_qq_plot(data, ax):
     """Create the Normal QQ plot."""
-    pass
+    quantiles, fit = scipy.stats.probplot(data, dist="norm")
+
+    # Order statistic medians, ordered responses.
+    osm, osr = quantiles 
+
+    slope, intercept, r = fit
+
+    ax.scatter(osm, osr, color="black", marker="o", s=10)
+    xs = np.arange(*ax.get_xlim())
+    ax.plot(xs, slope * xs + intercept, "--", color="#6D784B",
+            label="$R^2 = {:.4f}$".format(r))
+    ax.legend(loc="lower right")
+
+    ax.set_xlabel("Quantile")
+    ax.set_ylabel("Ordered Values")
 
 
 def extract_column(filename, field, delimiter):
