@@ -15,6 +15,7 @@ import logging
 import argparse
 import sys
 import gzip
+import functools
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -115,7 +116,10 @@ def extract_column(filename, field, delimiter):
         # Dummy function to read from stdin by default.
         opener = lambda x: sys.stdin
     else:
-        opener = open
+        if sys.version_info[0] == 3:
+            opener = functools.partial(open, errors="replace")
+        else:
+            opener = open
 
     f = opener(filename)
 
