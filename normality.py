@@ -74,7 +74,7 @@ def create_qq_plot(data, ax):
     quantiles, fit = scipy.stats.probplot(data, dist="norm")
 
     # Order statistic medians, ordered responses.
-    osm, osr = quantiles 
+    osm, osr = quantiles
 
     slope, intercept, r = fit
 
@@ -90,7 +90,7 @@ def create_qq_plot(data, ax):
 
 def extract_column(filename, field, delimiter):
     """ Extract a column of data from a file.
-    
+
     :param filename: The filename of the file containing the data.
                      If None is passed, the script will read from stdin.
     :type filename: str
