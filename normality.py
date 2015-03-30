@@ -9,7 +9,7 @@ distribution.
 
 """
 
-from __future__ import print_function
+from __future__ import print_function, division
 
 import logging
 import argparse
@@ -28,6 +28,42 @@ except ImportError:
 def main(filename, field, delimiter):
 
     data = extract_column(filename, field, delimiter)
+    data = data[~np.isnan(data)]
+
+    fig, axes = plt.subplots(2, 1)
+
+    create_histogram(data, axes[0])
+
+    create_qq_plot(data, axes[1])
+
+    plt.show()
+
+
+def create_histogram(data, ax):
+    """Create an histogram with a fitted normal curve."""
+
+    mu = np.mean(data)
+    sigma = np.std(data)
+
+    # See http://stackoverflow.com/questions/9767241/setting-a-relative-frequency-in-a-matplotlib-histogram
+    # for the relative frequency.
+    n, bins, patches = ax.hist(data, bins=60, edgecolor="#EDF1F4",
+                               facecolor="#112029",
+                               weights=np.zeros_like(data) + 1. / data.size)
+
+    # Overlap a normal curve.
+    normal_densities = 1 / (sigma * np.sqrt(2 * np.pi))
+    normal_densities *= np.exp(-((bins - mu) ** 2) / (2 * sigma ** 2))
+    ax.plot(bins, normal_densities, color="#99CC00",
+            label="$\mathcal{{N}}({:.3f}, {:.3f}^2)$".format(mu, sigma))
+
+    ax.set_ylabel("Relative frequency")
+    ax.legend()
+
+
+def create_qq_plot(data, ax):
+    """Create the Normal QQ plot."""
+    pass
 
 
 def extract_column(filename, field, delimiter):
