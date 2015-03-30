@@ -33,6 +33,7 @@ def main(filename, field, delimiter, out):
     data = data[~np.isnan(data)]
 
     fig, axes = plt.subplots(2, 1)
+    plt.subplots_adjust(hspace=0.35)
 
     create_histogram(data, axes[0])
 
@@ -69,6 +70,7 @@ def create_histogram(data, ax):
             label="$\mathcal{{N}}({:.3f}, {:.3f}^2)$".format(mu, sigma))
 
     ax.set_ylabel("Relative frequency")
+    ax.set_xlabel("Observation")
     ax.legend()
 
 
