@@ -59,9 +59,12 @@ def create_histogram(data, ax):
                                facecolor="#112029",
                                weights=np.zeros_like(data) + 1. / data.size)
 
+    max_y = ax.get_ylim()[1]
+
     # Overlap a normal curve.
     normal_densities = 1 / (sigma * np.sqrt(2 * np.pi))
     normal_densities *= np.exp(-((bins - mu) ** 2) / (2 * sigma ** 2))
+    normal_densities = normal_densities / np.max(normal_densities) * max_y
     ax.plot(bins, normal_densities, color="#99CC00",
             label="$\mathcal{{N}}({:.3f}, {:.3f}^2)$".format(mu, sigma))
 
